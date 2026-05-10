@@ -1,0 +1,873 @@
+<h2 class="sr-only">HydroGuard Live Dashboard — Smart Water Filtration & Quality Monitoring System</h2>
+
+<style>
+/* =========================================================
+   HydroGuard Dashboard Styles
+   These styles control the layout, cards, charts, tabs, and status panels.
+   ========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: transparent; }
+
+/* Hides text visually while keeping it available to screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Header and live demo badge */
+.hg-header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.hg-logo { display: flex; align-items: center; gap: 10px; }
+.hg-logo-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--color-background-info);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-info); font-size: 18px;
+}
+.hg-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); }
+.hg-subtitle { font-size: 12px; color: var(--color-text-secondary); margin-top: 1px; }
+.hg-live-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--color-text-success);
+  background: var(--color-background-success);
+  padding: 4px 10px; border-radius: 20px;
+}
+.hg-pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--color-text-success);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* Top status bar: Good / Warning / Critical */
+.hg-status-bar {
+  padding: 0.6rem 1.5rem;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px; font-weight: 500;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+}
+.hg-status-bar.good { background: var(--color-background-success); color: var(--color-text-success); }
+.hg-status-bar.warning { background: var(--color-background-warning); color: var(--color-text-warning); }
+.hg-status-bar.critical { background: var(--color-background-danger); color: var(--color-text-danger); }
+
+/* Navigation tabs */
+.hg-tabs {
+  display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary);
+  padding: 0 1.5rem; overflow-x: auto;
+}
+.hg-tab {
+  padding: 0.6rem 1rem;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.hg-tab.active { color: var(--color-text-info); border-bottom-color: var(--color-text-info); font-weight: 500; }
+.hg-tab:hover:not(.active) { color: var(--color-text-primary); }
+
+/* Main content area */
+.hg-content { padding: 1.25rem 1.5rem; }
+
+/* Sensor cards */
+.hg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+.hg-card {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 0.85rem 1rem;
+}
+.hg-card-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.hg-card-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+.hg-card-unit { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; }
+.hg-card-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; margin-top: 5px; display: inline-block; }
+.badge-good { background: var(--color-background-success); color: var(--color-text-success); }
+.badge-warning { background: var(--color-background-warning); color: var(--color-text-warning); }
+.badge-critical { background: var(--color-background-danger); color: var(--color-text-danger); }
+
+.hg-section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+/* Chart containers */
+.hg-chart-wrap { position: relative; width: 100%; height: 200px; margin-bottom: 1.25rem; }
+.hg-chart-sm { position: relative; width: 100%; height: 160px; }
+.hg-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+
+/* Recommendation / analysis panel */
+.hg-ai-panel {
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+.hg-ai-header { display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; }
+.hg-ai-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.hg-ai-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 0.5rem; }
+.hg-ai-action { font-size: 13px; color: var(--color-text-primary); line-height: 1.6; }
+.hg-ai-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 3px; margin-top: 0.6rem; }
+
+/* Raw vs. filtered comparison panel */
+.hg-compare {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center;
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.hg-compare-side { text-align: center; }
+.hg-compare-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.hg-compare-val { font-size: 28px; font-weight: 500; }
+.hg-compare-val.raw { color: #e24b4a; }
+.hg-compare-val.filt { color: #1d9e75; }
+.hg-compare-arrow { font-size: 22px; color: var(--color-text-secondary); text-align: center; }
+.hg-compare-pct { font-size: 13px; color: var(--color-text-success); font-weight: 500; margin-top: 4px; }
+
+.hg-maintenance-card {
+  border-left: 3px solid;
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.6rem;
+  background: var(--color-background-secondary);
+}
+.hg-maintenance-card.good { border-color: var(--color-text-success); }
+.hg-maintenance-card.warning { border-color: var(--color-text-warning); }
+.hg-maintenance-card.critical { border-color: var(--color-text-danger); }
+
+.hg-efficiency-bar { background: var(--color-background-secondary); border-radius: 6px; height: 10px; overflow: hidden; margin: 6px 0; }
+.hg-efficiency-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+
+.hg-overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+.hg-stage {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 0.85rem;
+  text-align: center;
+}
+.hg-stage-icon { font-size: 20px; margin-bottom: 6px; }
+.hg-stage-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+.hg-stage-desc { font-size: 11px; color: var(--color-text-secondary); }
+
+/* Tables used for test logs and system information */
+.hg-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.hg-table th { padding: 6px 10px; text-align: left; font-weight: 500; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 11px; }
+.hg-table td { padding: 7px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+.hg-table tr:last-child td { border-bottom: none; }
+
+.hg-time { font-size: 11px; color: var(--color-text-secondary); text-align: right; margin-top: 0.5rem; }
+.hg-limitation { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; padding: 0.75rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); margin-bottom: 0.6rem; }
+
+@media (max-width: 700px) {
+  .hg-header,
+  .hg-status-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hg-two-col,
+  .hg-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hidden { display: none; }
+</style>
+
+<div class="hg-header">
+  <div class="hg-logo">
+    <div class="hg-logo-icon"><i class="ti ti-droplet" aria-hidden="true"></i></div>
+    <div>
+      <div class="hg-title">HydroGuard Live</div>
+      <div class="hg-subtitle">Smart Water Filtration & Quality Monitoring Dashboard</div>
+    </div>
+  </div>
+  <div class="hg-live-badge"><div class="hg-pulse"></div>Demo Mode Active</div>
+</div>
+
+<div id="statusBar" class="hg-status-bar good">
+  <i class="ti ti-circle-check" aria-hidden="true"></i>
+  <span id="statusText">System Status: GOOD — All parameters within acceptable range</span>
+  <span style="margin-left: auto; font-weight: 400; font-size: 11px;" id="lastUpdated">Initializing...</span>
+</div>
+
+<div class="hg-tabs" role="tablist" aria-label="HydroGuard dashboard sections">
+  <button type="button" class="hg-tab active" onclick="showDashboardTab('dashboard')" aria-controls="tab-dashboard" aria-selected="true"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</button>
+  <button type="button" class="hg-tab" onclick="showDashboardTab('overview')" aria-controls="tab-overview" aria-selected="false"><i class="ti ti-sitemap" aria-hidden="true"></i> System Overview</button>
+  <button type="button" class="hg-tab" onclick="showDashboardTab('results')" aria-controls="tab-results" aria-selected="false"><i class="ti ti-chart-line" aria-hidden="true"></i> Test Results</button>
+  <button type="button" class="hg-tab" onclick="showDashboardTab('maintenance')" aria-controls="tab-maintenance" aria-selected="false"><i class="ti ti-tool" aria-hidden="true"></i> Maintenance</button>
+  <button type="button" class="hg-tab" onclick="showDashboardTab('about')" aria-controls="tab-about" aria-selected="false"><i class="ti ti-info-circle" aria-hidden="true"></i> About</button>
+</div>
+
+<div class="hg-content">
+
+<!-- ===== DASHBOARD TAB ===== -->
+<div id="tab-dashboard">
+
+<div class="hg-grid" id="sensorGrid"></div>
+
+<div class="hg-compare" id="comparePanel">
+  <div class="hg-compare-side">
+    <div class="hg-compare-label"><i class="ti ti-arrow-down-circle" style="color:#e24b4a"></i> Raw Influent</div>
+    <div class="hg-compare-val raw" id="cmpRaw">—</div>
+    <div class="hg-card-unit">NTU turbidity</div>
+  </div>
+  <div class="hg-compare-arrow">→</div>
+  <div class="hg-compare-side">
+    <div class="hg-compare-label"><i class="ti ti-arrow-up-circle" style="color:#1d9e75"></i> Filtered Effluent</div>
+    <div class="hg-compare-val filt" id="cmpFilt">—</div>
+    <div class="hg-card-unit">NTU turbidity</div>
+    <div class="hg-compare-pct" id="cmpPct"></div>
+  </div>
+</div>
+
+<div class="hg-section-title">Turbidity trend</div>
+<div class="hg-chart-wrap">
+  <canvas id="turbChart" role="img" aria-label="Line chart showing raw and filtered turbidity over time">Turbidity readings over time</canvas>
+</div>
+
+<div class="hg-two-col">
+  <div>
+    <div class="hg-section-title">Filtration efficiency %</div>
+    <div class="hg-chart-sm">
+      <canvas id="effChart" role="img" aria-label="Area chart of filtration efficiency over time">Filtration efficiency</canvas>
+    </div>
+  </div>
+  <div>
+    <div class="hg-section-title">Flow rate (L/min)</div>
+    <div class="hg-chart-sm">
+      <canvas id="flowChart" role="img" aria-label="Line chart of flow rate over time">Flow rate</canvas>
+    </div>
+  </div>
+</div>
+
+<div class="hg-section-title">AI recommendation engine</div>
+<div class="hg-ai-panel" id="aiPanel">
+  <div class="hg-ai-header">
+    <i class="ti ti-robot" style="font-size:18px; color: var(--color-text-info)" aria-hidden="true"></i>
+    <div class="hg-ai-title">System Analysis</div>
+    <span id="aiStatusBadge" class="hg-card-badge badge-good" style="margin-left:auto">Good</span>
+  </div>
+  <div class="hg-ai-label">Summary</div>
+  <div class="hg-ai-text" id="aiSummary">Analyzing...</div>
+  <div class="hg-ai-label">Recommended action</div>
+  <div class="hg-ai-action" id="aiAction">—</div>
+  <div class="hg-ai-label">Maintenance note</div>
+  <div class="hg-ai-text" id="aiMaint">—</div>
+</div>
+<div class="hg-time" id="dashTime"></div>
+</div>
+
+<!-- ===== OVERVIEW TAB ===== -->
+<div id="tab-overview" class="hidden">
+<div class="hg-section-title">Filtration stages</div>
+<div class="hg-overview-grid">
+  <div class="hg-stage"><div class="hg-stage-icon">🪣</div><div class="hg-stage-name">Raw water reservoir</div><div class="hg-stage-desc">Turbid influent with clay/sediment</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🕸️</div><div class="hg-stage-name">Pre-screen</div><div class="hg-stage-desc">Removes large debris &gt;5mm</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🪨</div><div class="hg-stage-name">Gravel layer</div><div class="hg-stage-desc">3–5 cm coarse support, captures large particles</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🏖️</div><div class="hg-stage-name">Coarse sand</div><div class="hg-stage-desc">5–8 cm depth, removes 0.1–2mm particles</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🌾</div><div class="hg-stage-name">Fine sand</div><div class="hg-stage-desc">8–10 cm depth, removes 0.02–0.1mm particles</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">⬛</div><div class="hg-stage-name">Activated carbon</div><div class="hg-stage-desc">5 cm depth, adsorbs colour and odor</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🪡</div><div class="hg-stage-name">Filter cloth</div><div class="hg-stage-desc">Final polishing, retains carbon fines</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">💧</div><div class="hg-stage-name">Treated water</div><div class="hg-stage-desc">Effluent collection — not for consumption</div></div>
+</div>
+
+<div class="hg-section-title">Sensor subsystems</div>
+<table class="hg-table">
+  <thead><tr><th>Sensor</th><th>Parameter</th><th>Protocol</th><th>ESP32 Pin</th><th>Range</th></tr></thead>
+  <tbody>
+    <tr><td>Turbidity ×2</td><td>Influent & effluent turbidity</td><td>Analog (ADC)</td><td>GPIO34, GPIO35</td><td>0–3000 NTU</td></tr>
+    <tr><td>pH board</td><td>Acidity/alkalinity</td><td>Analog (ADC)</td><td>GPIO32</td><td>pH 0–14</td></tr>
+    <tr><td>TDS probe</td><td>Total dissolved solids</td><td>Analog (ADC)</td><td>GPIO33</td><td>0–1000 ppm</td></tr>
+    <tr><td>DS18B20</td><td>Water temperature</td><td>1-Wire Digital</td><td>GPIO4</td><td>-10 to 85°C</td></tr>
+    <tr><td>YF-S201</td><td>Volumetric flow rate</td><td>Digital Interrupt</td><td>GPIO18</td><td>1–30 L/min</td></tr>
+  </tbody>
+</table>
+
+<div style="margin-top:1rem">
+<div class="hg-section-title">Software stack</div>
+<table class="hg-table">
+  <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Firmware</td><td>ESP32 / Arduino C++</td><td>Sensor reading, JSON output</td></tr>
+    <tr><td>Data logging</td><td>Python + pyserial</td><td>Serial read, CSV storage, metrics</td></tr>
+    <tr><td>AI engine</td><td>Python rule-based</td><td>Anomaly detection, recommendations</td></tr>
+    <tr><td>Dashboard A</td><td>Streamlit + Plotly</td><td>Local live dashboard</td></tr>
+    <tr><td>Dashboard B</td><td>React + FastAPI</td><td>Full web app deployment</td></tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+<!-- ===== TEST RESULTS TAB ===== -->
+<div id="tab-results" class="hidden">
+<div class="hg-section-title">Performance metrics — current run</div>
+<div id="metricsGrid" class="hg-grid"></div>
+
+<div class="hg-section-title">Engineering calculations</div>
+<div class="hg-ai-panel">
+  <div class="hg-ai-label">Turbidity reduction %</div>
+  <div class="hg-ai-text" style="font-family: var(--font-mono); font-size: 12px;">
+    η_turbidity = ((NTU_raw − NTU_filtered) / NTU_raw) × 100
+  </div>
+  <div class="hg-ai-label">Flow decline %</div>
+  <div class="hg-ai-text" style="font-family: var(--font-mono); font-size: 12px;">
+    δ_flow = ((Q_baseline − Q_current) / Q_baseline) × 100
+  </div>
+  <div class="hg-ai-label">Filter performance score (0–100)</div>
+  <div class="hg-ai-text" style="font-family: var(--font-mono); font-size: 12px;">
+    FPS = 0.5 × η_turbidity + 0.3 × (100 − δ_flow) + 0.2 × pH_score
+  </div>
+  <div class="hg-ai-label">Current filter performance score</div>
+  <div class="hg-ai-action" id="fpsDisplay">Calculating...</div>
+</div>
+
+<div class="hg-section-title">Test conditions log</div>
+<table class="hg-table" id="resultsTable">
+  <thead>
+    <tr><th>#</th><th>Time</th><th>Raw NTU</th><th>Filt NTU</th><th>Reduction %</th><th>pH</th><th>TDS ppm</th><th>Flow L/min</th><th>Status</th></tr>
+  </thead>
+  <tbody id="resultsBody"></tbody>
+</table>
+</div>
+
+<!-- ===== MAINTENANCE TAB ===== -->
+<div id="tab-maintenance" class="hidden">
+<div class="hg-section-title">Filter condition</div>
+<div id="maintenanceCards"></div>
+
+<div class="hg-section-title">Testing plan summary</div>
+<table class="hg-table">
+  <thead><tr><th>Test</th><th>Goal</th><th>Expected result</th><th>Failure indicator</th></tr></thead>
+  <tbody>
+    <tr><td>Clean water baseline</td><td>Verify sensors read zero turbidity</td><td>&lt;5 NTU, pH 7±0.3</td><td>Sensor drift or offset</td></tr>
+    <tr><td>Light turbidity (20 NTU)</td><td>Moderate filtration efficiency</td><td>&gt;80% reduction</td><td>&lt;70% suggests channeling</td></tr>
+    <tr><td>High turbidity (200 NTU)</td><td>Full system challenge test</td><td>&gt;75% reduction</td><td>&lt;60% suggests media failure</td></tr>
+    <tr><td>1-hour clogging run</td><td>Observe flow decline</td><td>Gradual decline to &lt;50%</td><td>Sudden drop = bypass</td></tr>
+    <tr><td>Sensor disconnect test</td><td>Error handling</td><td>System flags anomaly</td><td>Crash = missing validation</td></tr>
+    <tr><td>pH verification</td><td>Confirm pH sensor accuracy</td><td>±0.2 of pH 7 buffer</td><td>&gt;±0.5 = recalibrate</td></tr>
+    <tr><td>TDS verification</td><td>Confirm TDS sensor accuracy</td><td>±5% of known standard</td><td>&gt;10% = recalibrate</td></tr>
+  </tbody>
+</table>
+
+<div style="margin-top:1rem" class="hg-section-title">Calibration reminders</div>
+<div class="hg-maintenance-card warning">
+  <div style="font-size:13px; font-weight:500; color:var(--color-text-warning)">pH sensor — calibrate before each session</div>
+  <div style="font-size:12px; color:var(--color-text-secondary); margin-top:4px">Use pH 4.0, 7.0, and 10.0 buffer solutions. Two-point minimum. Rinse probe with DI water between buffers. pH sensors drift — especially below pH 5. Store probe in 3M KCl storage solution.</div>
+</div>
+<div class="hg-maintenance-card good">
+  <div style="font-size:13px; font-weight:500; color:var(--color-text-success)">Turbidity — weekly verification</div>
+  <div style="font-size:12px; color:var(--color-text-secondary); margin-top:4px">Zero-calibrate in clean DI water. Verify with 100 NTU formazin reference if available. Wipe sensor lens with soft cloth. Avoid air bubbles in the measurement chamber.</div>
+</div>
+<div class="hg-maintenance-card good">
+  <div style="font-size:13px; font-weight:500; color:var(--color-text-success)">TDS — calibrate with 342 ppm NaCl standard</div>
+  <div style="font-size:12px; color:var(--color-text-secondary); margin-top:4px">Make 0.5g NaCl in 1L DI water = ~1000 ppm. Dilute 1:3 for 342 ppm standard. Adjust K constant in code until sensor reads within 5%.</div>
+</div>
+</div>
+
+<!-- ===== ABOUT TAB ===== -->
+<div id="tab-about" class="hidden">
+<div class="hg-section-title">Project overview</div>
+<div class="hg-ai-panel">
+  <div class="hg-ai-text">HydroGuard is a bench-scale smart water filtration and quality monitoring platform built as an engineering portfolio project. It integrates a physical multi-stage gravity filtration unit, a microcontroller-based sensor array, Python data logging, a rule-based AI recommendation engine, and this professional live web dashboard.</div>
+  <div class="hg-ai-label">Connection to water infrastructure</div>
+  <div class="hg-ai-text">This project demonstrates the workflow used by environmental and water engineering consultants to evaluate treatment performance, collect field data, log results, and communicate findings to clients and regulators. The skills involved — sensor integration, data analysis, treatment efficiency calculations, dashboard communication, and AI-assisted anomaly detection — are directly applicable to water infrastructure work at firms like Stantec, WSP, AECOM, Hatch, and Jacobs.</div>
+  <div class="hg-ai-label">Safety disclaimer (important)</div>
+  <div class="hg-ai-text">HydroGuard is a prototype monitoring and demonstration system only. Output water must not be consumed. The system is not a certified water treatment device. Cheap analog sensors are not laboratory-grade instruments. pH sensors drift over time. TDS is not equivalent to water safety. Sand and activated carbon do not remove all contaminants, dissolved metals, pathogens, or pharmaceuticals. The value of this project lies in demonstrating systems integration, monitoring concepts, data analysis, and engineering communication — not in producing potable water.</div>
+</div>
+
+<div class="hg-section-title">Honest limitations</div>
+<div class="hg-limitation">Analog sensors (turbidity, pH, TDS) have ±5–15% accuracy and require regular calibration. Results should be treated as indicative, not laboratory-certified.</div>
+<div class="hg-limitation">The ESP32 ADC is non-linear near rail voltages. Readings at 0V and 3.3V extremes are unreliable. All sensor conditioning boards should be verified for output voltage range compatibility.</div>
+<div class="hg-limitation">Sand and activated carbon filtration effectively reduces turbidity and some adsorbed compounds. It does not reliably remove dissolved nitrates, heavy metals, fluoride, microorganisms, or pharmaceutical residues.</div>
+<div class="hg-limitation">This dashboard is running in demo mode. Simulated data is designed to be realistic but does not represent actual sensor measurements. Connect the ESP32 and Python data logger for real readings.</div>
+
+<div class="hg-section-title">Future improvements</div>
+<div class="hg-overview-grid">
+  <div class="hg-stage"><div class="hg-stage-icon">📡</div><div class="hg-stage-name">LoRaWAN</div><div class="hg-stage-desc">Wireless transmission for remote sites</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">☁️</div><div class="hg-stage-name">Cloud DB</div><div class="hg-stage-desc">InfluxDB or AWS IoT for persistent storage</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🔁</div><div class="hg-stage-name">Backwash</div><div class="hg-stage-desc">Automated valve-controlled backwash cycle</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🔬</div><div class="hg-stage-name">Lab validation</div><div class="hg-stage-desc">Cross-check sensors with certified lab analysis</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">🤖</div><div class="hg-stage-name">ML model</div><div class="hg-stage-desc">scikit-learn clogging predictor on historical data</div></div>
+  <div class="hg-stage"><div class="hg-stage-icon">☀️</div><div class="hg-stage-name">Solar power</div><div class="hg-stage-desc">Off-grid operation for field deployment</div></div>
+</div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// =========================================================
+// HydroGuard Dashboard Logic
+//
+// This demo version does four main things:
+// 1. Creates realistic simulated water-quality readings.
+// 2. Classifies each reading as good, warning, or critical.
+// 3. Updates the cards, charts, recommendation panel, and tables.
+// 4. Keeps the dashboard running while real ESP32 data is not connected yet.
+// =========================================================
+
+const MAX_CHART_POINTS = 40;
+
+const dashboardState = {
+  readings: [],
+  readingNumber: 0,
+  baselineFlowRate: null,
+  turbidityChart: null,
+  efficiencyChart: null,
+  flowChart: null,
+  activeTab: 'dashboard'
+};
+
+// Shows the selected dashboard tab and hides the others.
+function showDashboardTab(tabName) {
+  const tabNames = ['dashboard', 'overview', 'results', 'maintenance', 'about'];
+
+  tabNames.forEach(name => {
+    document.getElementById('tab-' + name).classList.toggle('hidden', name !== tabName);
+  });
+
+  document.querySelectorAll('.hg-tab').forEach((tabButton, index) => {
+    const isActive = tabNames[index] === tabName;
+    tabButton.classList.toggle('active', isActive);
+    tabButton.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+
+  dashboardState.activeTab = tabName;
+}
+
+// Creates realistic demo readings so the dashboard works before ESP32 data is connected.
+function createDemoSensorReading(readingNumber) {
+  const elapsedSeconds = readingNumber * 5;
+  const cappedReadingNumber = Math.min(readingNumber, 100);
+
+  const rawTurbidity = 148 + Math.sin(readingNumber * 0.3) * 4;
+  const filtrationEfficiency = Math.max(0.52, 0.91 - (cappedReadingNumber / 85) * 0.38);
+  const filteredTurbidity = Math.max(
+    2,
+    rawTurbidity * (1 - filtrationEfficiency) + (Math.random() - 0.5) * 3
+  );
+
+  const turbidityReduction = ((rawTurbidity - filteredTurbidity) / rawTurbidity) * 100;
+  const ph = 7.05 + Math.sin(readingNumber * 0.15) * 0.28 + (Math.random() - 0.5) * 0.08;
+  const tds = 278 + Math.sin(readingNumber * 0.1) * 12 + (Math.random() - 0.5) * 6;
+  const temperature = 20.4 + (Math.random() - 0.5) * 0.4;
+  const flowRate = Math.max(
+    0.12,
+    0.83 - (cappedReadingNumber / 78) * 0.68 + (Math.random() - 0.5) * 0.015
+  );
+
+  if (!dashboardState.baselineFlowRate) {
+    dashboardState.baselineFlowRate = flowRate;
+  }
+
+  return {
+    readingNumber,
+    elapsedSeconds,
+    rawTurbidity,
+    filteredTurbidity,
+    turbidityReduction,
+    ph,
+    tds,
+    temperature,
+    flowRate
+  };
+}
+
+// Converts one reading into a simple system status.
+function classifyReadingStatus(reading) {
+  const flowPercent = dashboardState.baselineFlowRate
+    ? (reading.flowRate / dashboardState.baselineFlowRate) * 100
+    : 100;
+
+  if (
+    reading.turbidityReduction < 55 ||
+    flowPercent < 30 ||
+    reading.ph < 5.5 ||
+    reading.ph > 9.5
+  ) {
+    return 'critical';
+  }
+
+  if (
+    reading.turbidityReduction < 70 ||
+    flowPercent < 60 ||
+    reading.ph < 6.5 ||
+    reading.ph > 8.5
+  ) {
+    return 'warning';
+  }
+
+  return 'good';
+}
+
+// Creates the rule-based recommendation shown in the dashboard.
+function buildRecommendation(reading) {
+  const flowPercent = dashboardState.baselineFlowRate
+    ? (reading.flowRate / dashboardState.baselineFlowRate) * 100
+    : 100;
+
+  const issues = [];
+  const actions = [];
+  let maintenanceNote = 'No immediate maintenance required.';
+
+  if (reading.turbidityReduction >= 82) {
+    // Strong performance. No action needed.
+  } else if (reading.turbidityReduction >= 65) {
+    issues.push('moderate turbidity removal');
+    actions.push('Consider increasing fine sand depth by 2–3 cm and replacing the pre-filter cloth layer.');
+  } else {
+    issues.push('poor turbidity removal');
+    actions.push('Low reduction may indicate channeling along the column walls. Compact the media, verify layer depths, and rebuild the column if the problem continues.');
+  }
+
+  if (flowPercent < 30) {
+    issues.push('severe filter clogging');
+    actions.push(`Flow has dropped to ${flowPercent.toFixed(0)}% of baseline. Shut down the system, rinse the gravel and pre-filter screen, replace the filter cloth, then retest.`);
+    maintenanceNote = 'Urgent: rinse or replace the upper filter layers. Perform a backwash cycle if available.';
+  } else if (flowPercent < 60) {
+    issues.push('moderate flow decline');
+    actions.push(`Flow is at ${flowPercent.toFixed(0)}% of baseline. Schedule a pre-filter rinse within the next 2 operating hours.`);
+    maintenanceNote = 'Pre-filter rinse recommended. Continue watching the flow-rate trend.';
+  }
+
+  if (reading.ph < 6.5 || reading.ph > 8.5) {
+    issues.push('pH outside acceptable range');
+    actions.push(`pH is ${reading.ph.toFixed(2)}, which is outside the 6.5–8.5 guidance range. Sand/carbon filtration does not correct pH, so this is an expected limitation of the prototype.`);
+  }
+
+  if (issues.length === 0) {
+    return {
+      status: classifyReadingStatus(reading),
+      summary: `Filtered turbidity improved by ${reading.turbidityReduction.toFixed(1)}%. pH is ${reading.ph.toFixed(2)}, TDS is ${reading.tds.toFixed(0)} ppm, and flow is stable at ${flowPercent.toFixed(0)}% of baseline. The system is performing well.`,
+      action: 'Continue monitoring. No adjustments are required right now.',
+      maintenance: maintenanceNote
+    };
+  }
+
+  return {
+    status: classifyReadingStatus(reading),
+    summary: `Issues detected: ${issues.join('; ')}. Turbidity reduction is ${reading.turbidityReduction.toFixed(1)}%, and flow is ${flowPercent.toFixed(0)}% of baseline.`,
+    action: actions[0] || 'Inspect the filtration column and sensor connections.',
+    maintenance: maintenanceNote
+  };
+}
+
+function getStatusBadgeClass(status) {
+  const badgeClasses = {
+    good: 'badge-good',
+    warning: 'badge-warning',
+    critical: 'badge-critical'
+  };
+
+  return badgeClasses[status] || 'badge-good';
+}
+
+// Updates the top status banner.
+function updateSystemStatusBar(status, reading) {
+  const statusBar = document.getElementById('statusBar');
+  const messages = {
+    good: `System status: GOOD — Turbidity reduction ${reading.turbidityReduction.toFixed(1)}%, flow stable`,
+    warning: `System status: WARNING — ${reading.turbidityReduction.toFixed(1)}% turbidity reduction, check recommendations`,
+    critical: 'System status: CRITICAL — Immediate attention required'
+  };
+
+  statusBar.className = 'hg-status-bar ' + status;
+  document.getElementById('statusText').textContent = messages[status] || messages.good;
+  document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+}
+
+// Rebuilds the sensor cards using the latest reading.
+function updateSensorCards(reading) {
+  const flowPercent = dashboardState.baselineFlowRate
+    ? (reading.flowRate / dashboardState.baselineFlowRate) * 100
+    : 100;
+
+  const phStatus = reading.ph >= 6.5 && reading.ph <= 8.5
+    ? 'good'
+    : reading.ph >= 5.5 && reading.ph <= 9.5
+      ? 'warning'
+      : 'critical';
+
+  const flowStatus = flowPercent >= 80 ? 'good' : flowPercent >= 50 ? 'warning' : 'critical';
+  const turbidityStatus = reading.turbidityReduction >= 75
+    ? 'good'
+    : reading.turbidityReduction >= 55
+      ? 'warning'
+      : 'critical';
+
+  const filterScore = Math.round(
+    0.5 * reading.turbidityReduction +
+    0.3 * (100 - Math.max(0, 100 - flowPercent)) +
+    0.2 * (phStatus === 'good' ? 100 : 60)
+  );
+
+  const cards = [
+    { label: 'Raw turbidity', icon: 'ti-arrow-down-circle', value: reading.rawTurbidity.toFixed(1), unit: 'NTU', status: 'good' },
+    { label: 'Filtered turbidity', icon: 'ti-arrow-up-circle', value: reading.filteredTurbidity.toFixed(1), unit: 'NTU', status: turbidityStatus },
+    { label: 'Reduction', icon: 'ti-percentage', value: reading.turbidityReduction.toFixed(1), unit: '%', status: turbidityStatus },
+    { label: 'pH', icon: 'ti-atom', value: reading.ph.toFixed(2), unit: '', status: phStatus },
+    { label: 'TDS', icon: 'ti-flask', value: reading.tds.toFixed(0), unit: 'ppm', status: reading.tds < 300 ? 'good' : reading.tds < 600 ? 'warning' : 'critical' },
+    { label: 'Temperature', icon: 'ti-temperature', value: reading.temperature.toFixed(1), unit: '°C', status: 'good' },
+    { label: 'Flow rate', icon: 'ti-wave-sine', value: reading.flowRate.toFixed(3), unit: 'L/min', status: flowStatus },
+    { label: 'Filter score', icon: 'ti-star', value: filterScore, unit: '/100', status: turbidityStatus }
+  ];
+
+  document.getElementById('sensorGrid').innerHTML = cards.map(card => `
+    <div class="hg-card">
+      <div class="hg-card-label"><i class="ti ${card.icon}" aria-hidden="true"></i>${card.label}</div>
+      <div class="hg-card-value">${card.value}</div>
+      <div class="hg-card-unit">${card.unit}</div>
+      <span class="hg-card-badge ${getStatusBadgeClass(card.status)}">${card.status}</span>
+    </div>
+  `).join('');
+}
+
+function updateBeforeAfterPanel(reading) {
+  document.getElementById('cmpRaw').textContent = reading.rawTurbidity.toFixed(1);
+  document.getElementById('cmpFilt').textContent = reading.filteredTurbidity.toFixed(1);
+  document.getElementById('cmpPct').textContent = `↓ ${reading.turbidityReduction.toFixed(1)}% reduction`;
+}
+
+function updateRecommendationPanel(reading, recommendation) {
+  const badge = document.getElementById('aiStatusBadge');
+
+  document.getElementById('aiSummary').textContent = recommendation.summary;
+  document.getElementById('aiAction').textContent = recommendation.action;
+  document.getElementById('aiMaint').textContent = recommendation.maintenance;
+
+  badge.className = 'hg-card-badge ' + getStatusBadgeClass(recommendation.status);
+  badge.textContent = recommendation.status.charAt(0).toUpperCase() + recommendation.status.slice(1);
+
+  document.getElementById('dashTime').textContent =
+    'Simulated reading #' + reading.readingNumber + ' — Demo mode — ' + new Date().toLocaleTimeString();
+}
+
+function initializeCharts() {
+  const sharedChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 0 },
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { display: false },
+      y: {
+        grid: { color: 'rgba(128,128,128,0.1)' },
+        ticks: { font: { size: 11 } }
+      }
+    }
+  };
+
+  dashboardState.turbidityChart = new Chart(document.getElementById('turbChart'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Raw NTU', data: [], borderColor: '#e24b4a', borderWidth: 2, pointRadius: 0, tension: 0.3, fill: false },
+        { label: 'Filtered NTU', data: [], borderColor: '#1d9e75', borderWidth: 2, pointRadius: 0, tension: 0.3, fill: false, borderDash: [4, 2] }
+      ]
+    },
+    options: sharedChartOptions
+  });
+
+  dashboardState.efficiencyChart = new Chart(document.getElementById('effChart'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { data: [], borderColor: '#378add', borderWidth: 2, pointRadius: 0, tension: 0.3, fill: true, backgroundColor: 'rgba(55,138,221,0.1)' }
+      ]
+    },
+    options: {
+      ...sharedChartOptions,
+      scales: {
+        x: { display: false },
+        y: {
+          min: 0,
+          max: 100,
+          grid: { color: 'rgba(128,128,128,0.1)' },
+          ticks: { font: { size: 10 } }
+        }
+      }
+    }
+  });
+
+  dashboardState.flowChart = new Chart(document.getElementById('flowChart'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { data: [], borderColor: '#ab47bc', borderWidth: 2, pointRadius: 0, tension: 0.3, fill: false }
+      ]
+    },
+    options: sharedChartOptions
+  });
+}
+
+function addReadingToChart(chart, label, ...values) {
+  chart.data.labels.push(label);
+
+  values.forEach((value, index) => {
+    chart.data.datasets[index].data.push(value);
+
+    if (chart.data.datasets[index].data.length > MAX_CHART_POINTS) {
+      chart.data.datasets[index].data.shift();
+    }
+  });
+
+  if (chart.data.labels.length > MAX_CHART_POINTS) {
+    chart.data.labels.shift();
+  }
+
+  chart.update('none');
+}
+
+function updateTestResultsTab(readings) {
+  const latestReading = readings[readings.length - 1];
+  const flowPercent = dashboardState.baselineFlowRate
+    ? (latestReading.flowRate / dashboardState.baselineFlowRate) * 100
+    : 100;
+
+  const filterPerformanceScore = Math.round(
+    0.5 * latestReading.turbidityReduction +
+    0.3 * Math.max(0, flowPercent) +
+    0.2 * (latestReading.ph >= 6.5 && latestReading.ph <= 8.5 ? 100 : 50)
+  );
+
+  document.getElementById('fpsDisplay').textContent =
+    `${filterPerformanceScore}/100 — ${filterPerformanceScore > 75 ? 'Good performance' : filterPerformanceScore > 55 ? 'Acceptable — review recommendations' : 'Poor — inspect system'}`;
+
+  const averageReduction = readings.reduce((total, item) => total + item.turbidityReduction, 0) / readings.length;
+  const averageFlow = readings.reduce((total, item) => total + item.flowRate, 0) / readings.length;
+  const peakRawTurbidity = Math.max(...readings.map(item => item.rawTurbidity));
+  const bestFilteredTurbidity = Math.min(...readings.map(item => item.filteredTurbidity));
+
+  const metrics = [
+    { label: 'Avg reduction', value: averageReduction.toFixed(1) + '%' },
+    { label: 'Peak raw turbidity', value: peakRawTurbidity.toFixed(1) + ' NTU' },
+    { label: 'Best filtered', value: bestFilteredTurbidity.toFixed(1) + ' NTU' },
+    { label: 'Avg flow', value: averageFlow.toFixed(3) + ' L/min' },
+    { label: 'Total readings', value: readings.length },
+    { label: 'Filter score', value: filterPerformanceScore + '/100' }
+  ];
+
+  document.getElementById('metricsGrid').innerHTML = metrics.map(metric => `
+    <div class="hg-card">
+      <div class="hg-card-label">${metric.label}</div>
+      <div class="hg-card-value">${metric.value}</div>
+    </div>
+  `).join('');
+
+  const recentReadings = readings.slice(-8).reverse();
+
+  document.getElementById('resultsBody').innerHTML = recentReadings.map((reading, index) => `
+    <tr>
+      <td>${readings.length - index}</td>
+      <td>${new Date().toLocaleTimeString()}</td>
+      <td>${reading.rawTurbidity.toFixed(1)}</td>
+      <td>${reading.filteredTurbidity.toFixed(1)}</td>
+      <td>${reading.turbidityReduction.toFixed(1)}%</td>
+      <td>${reading.ph.toFixed(2)}</td>
+      <td>${reading.tds.toFixed(0)}</td>
+      <td>${reading.flowRate.toFixed(3)}</td>
+      <td><span class="hg-card-badge ${getStatusBadgeClass(classifyReadingStatus(reading))}">${classifyReadingStatus(reading)}</span></td>
+    </tr>
+  `).join('');
+}
+
+function updateMaintenanceTab(reading) {
+  const flowPercent = dashboardState.baselineFlowRate
+    ? (reading.flowRate / dashboardState.baselineFlowRate) * 100
+    : 100;
+
+  const maintenanceItems = [
+    {
+      label: 'Pre-filter screen',
+      status: flowPercent > 70 ? 'good' : flowPercent > 45 ? 'warning' : 'critical',
+      note: flowPercent > 70 ? 'Operating normally' : `Flow at ${flowPercent.toFixed(0)}% — inspect for clogging`
+    },
+    {
+      label: 'Filter cloth (top)',
+      status: reading.filteredTurbidity < 20 ? 'good' : 'warning',
+      note: reading.filteredTurbidity < 20 ? 'Effective polishing' : 'Elevated effluent turbidity — inspect cloth'
+    },
+    {
+      label: 'Activated carbon layer',
+      status: 'good',
+      note: 'No odor/color indicators — normal for test sediment'
+    },
+    {
+      label: 'pH sensor',
+      status: 'good',
+      note: `Reading ${reading.ph.toFixed(2)} — within expected range. Calibrate weekly.`
+    },
+    {
+      label: 'Turbidity sensors',
+      status: 'good',
+      note: 'Both sensors responding normally — verify with reference standard monthly'
+    },
+    {
+      label: 'Flow sensor (YF-S201)',
+      status: flowPercent > 50 ? 'good' : 'warning',
+      note: `${reading.flowRate.toFixed(3)} L/min — ${flowPercent < 50 ? 'check for partial blockage at sensor body' : 'normal'}`
+    }
+  ];
+
+  document.getElementById('maintenanceCards').innerHTML = maintenanceItems.map(item => `
+    <div class="hg-maintenance-card ${item.status}">
+      <div style="font-size:13px;font-weight:500;color:var(--color-text-${item.status === 'good' ? 'success' : item.status === 'warning' ? 'warning' : 'danger'})">${item.label} — ${item.status.toUpperCase()}</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:3px">${item.note}</div>
+    </div>
+  `).join('');
+}
+
+// Main update loop. Later, this is the function you would modify to use real ESP32/Python data.
+function updateDashboardWithNewReading() {
+  dashboardState.readingNumber++;
+
+  const reading = createDemoSensorReading(dashboardState.readingNumber);
+  dashboardState.readings.push(reading);
+
+  if (dashboardState.readings.length > 200) {
+    dashboardState.readings.shift();
+  }
+
+  const status = classifyReadingStatus(reading);
+  const recommendation = buildRecommendation(reading);
+  const chartLabel = dashboardState.readingNumber.toString();
+
+  updateSystemStatusBar(status, reading);
+  updateSensorCards(reading);
+  updateBeforeAfterPanel(reading);
+  updateRecommendationPanel(reading, recommendation);
+
+  addReadingToChart(dashboardState.turbidityChart, chartLabel, reading.rawTurbidity, reading.filteredTurbidity);
+  addReadingToChart(dashboardState.efficiencyChart, chartLabel, reading.turbidityReduction);
+  addReadingToChart(dashboardState.flowChart, chartLabel, reading.flowRate);
+
+  if (dashboardState.activeTab === 'results') {
+    updateTestResultsTab(dashboardState.readings);
+  }
+
+  if (dashboardState.activeTab === 'maintenance') {
+    updateMaintenanceTab(reading);
+  }
+}
+
+// Start the dashboard.
+initializeCharts();
+updateDashboardWithNewReading();
+setInterval(updateDashboardWithNewReading, 4000);
+</script>
