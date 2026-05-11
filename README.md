@@ -101,3 +101,44 @@ HydroGuard-Smart-Water-Monitoring/
 ├── data/
 ├── docs/
 └── images/
+
+HydroGuard-Smart-Water-Monitoring/
+│
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── LICENSE
+│
+├── esp32/
+│   └── hydroguard_sensor_system.ino
+│
+├── python/
+│   ├── data_logger.py
+│   ├── ai_recommendation_engine.py
+│   ├── fake_data_generator.py
+│   └── dashboard_streamlit.py
+│
+├── backend/
+│   └── main.py
+│
+├── frontend/
+│   ├── package.json
+│   └── src/
+│       ├── App.jsx
+│       ├── main.jsx
+│       └── components/
+│
+├── data/
+│   └── sample_hydroguard_readings.csv
+│
+├── docs/
+│   ├── project_report.md
+│   ├── wiring_guide.md
+│   ├── testing_plan.md
+│   ├── calibration_guide.md
+│   └── cost_estimate.md
+│
+└── images/
+    ├── system_diagram.png
+    ├── dashboard_preview.png
+    └── prototype_photos/
