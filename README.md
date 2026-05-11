@@ -1,27 +1,103 @@
-HydroGuard - Demo(prototype)
-----------
-HydroGuard is a smart water filtration and water-quality monitoring prototype. It combines a physical filtration system with sensors, data logging, programming, and a live dashboard.
+# HydroGuard — Smart Water Filtration & Quality Monitoring System
 
+HydroGuard is a bench-scale smart water filtration and monitoring prototype designed to evaluate filtration performance using sensor data, live visualization, and basic recommendation logic.
 
+The system combines a physical multi-stage filtration setup with turbidity, pH, TDS, temperature, and flow-rate sensing. Sensor readings are collected through an ESP32 microcontroller, logged using Python, and displayed through a live dashboard.
 
-Goal: 
+> **Status:** In Progress  
+> This project is a prototype for engineering learning and demonstration. It is not a certified drinking water treatment system.
 
-The goal is to track water-quality readings such as:
+---
 
-- Turbidity
+## Project Purpose
+
+This project explores practical water treatment, environmental monitoring, and sustainable infrastructure design.
+
+The goal is to measure how well a small-scale filtration system improves water clarity and to use collected data to guide maintenance and design improvements.
+
+HydroGuard demonstrates skills in:
+
+- Water filtration and treatment fundamentals
+- Environmental data collection
+- Sensor integration
+- Microcontroller programming
+- Data logging and visualization
+- Technical reporting
+- Cost estimation
+- Sustainable system design
+
+---
+
+## System Overview
+
+HydroGuard uses a multi-stage filtration system made from:
+
+- Gravel
+- Coarse sand
+- Fine sand
+- Activated carbon
+- Filter cloth or polishing layer
+
+Water-quality readings are taken before and after filtration to evaluate performance.
+
+The system measures:
+
+- Raw water turbidity
+- Filtered water turbidity
 - pH
-- Temperature
 - TDS
+- Temperature
 - Flow rate
-- Filter performance
 
-Current Version
+The dashboard displays:
 
-This repo currently includes a demo dashboard using simulated sensor data. The demo shows how the final system will display readings, calculate filtration performance, and provide status labels such as "Good", "Warning", or "Critical".
+- Live sensor readings
+- Turbidity reduction percentage
+- Flow-rate trends
+- System status
+- Maintenance warnings
+- Filtration performance summaries
 
+---
 
-Planned Final Version:
+## Hardware
 
-The final system will connect real sensor readings from an ESP32 to Python data logging and a live dashboard.
+| Component | Purpose |
+|---|---|
+| ESP32 | Main microcontroller |
+| Turbidity Sensor x2 | Measures water clarity before and after filtration |
+| pH Sensor | Measures acidity/basicity |
+| TDS Sensor | Measures dissolved solids |
+| Temperature Sensor | Measures water temperature |
+| Flow Sensor | Measures water flow rate |
+| Gravel, Sand, Activated Carbon | Filtration media |
+| Tubing and Containers | Water movement and storage |
+| Breadboard and Jumper Wires | Circuit prototyping |
 
-Sensors -> ESP32 -> Python Logger -> CSV Data -> Dashboard -> Recommendations 
+---
+
+## Software
+
+| Tool | Purpose |
+|---|---|
+| Arduino C++ | ESP32 sensor firmware |
+| Python | Data logging and processing |
+| CSV | Stores sensor readings |
+| Streamlit | Local dashboard |
+| Plotly | Data visualization |
+| FastAPI | Optional backend |
+| React | Optional web frontend |
+
+---
+
+## File Structure
+
+```text
+HydroGuard-Smart-Water-Monitoring/
+├── esp32/
+├── python/
+├── backend/
+├── frontend/
+├── data/
+├── docs/
+└── images/
