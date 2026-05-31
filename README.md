@@ -60,20 +60,23 @@ The dashboard displays:
 
 ---
 
-## Hardware
+## Estimated Cost
 
-| Component | Purpose |
-|---|---|
-| ESP32 | Main microcontroller |
-| Turbidity Sensor x2 | Measures water clarity before and after filtration |
-| pH Sensor | Measures acidity/basicity |
-| TDS Sensor | Measures dissolved solids |
-| Temperature Sensor | Measures water temperature |
-| Flow Sensor | Measures water flow rate |
-| Gravel, Sand, Activated Carbon | Filtration media |
-| Tubing and Containers | Water movement and storage |
-| Breadboard and Jumper Wires | Circuit prototyping |
+| Component | Estimated Cost |
+|---|---:|
+| ESP32 | $8–15 |
+| Turbidity Sensor x2 | $20–35 |
+| pH Sensor | $20–40 |
+| TDS Sensor | $10–20 |
+| Temperature Sensor | $5–10 |
+| Flow Sensor | $8–15 |
+| Gravel, Sand, Activated Carbon | $10–20 |
+| Tubing and Containers | $10–25 |
+| Breadboard and Jumper Wires | $10–15 |
 
+**Total Estimated Cost:** $100–185 CAD
+
+Costs may vary depending on supplier, shipping, and whether components are purchased individually or in kits.
 ---
 
 ## Software
